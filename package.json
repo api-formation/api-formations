@@ -24,6 +24,7 @@
     "morgan": "^1.10.1",
     "nodemon": "^3.1.11",
     "pg": "^8.16.3",
+    "swagger": "^0.7.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
