@@ -12,7 +12,7 @@ export class Formation {
     #idCategorie;
     #idContent;
 
-    constructor({ idFormation, titre, prix, description, duration, dateMiseEnLigne, langue, nbParticipants, prerequis, idCategorie, idContent}) {
+    constructor({ idFormation, titre, prix, description, duration, dateMiseEnLigne, langue, nbParticipants,idCategorie, idContent}) {
         this.#idFormation = idFormation;
         this.#titre = titre,
         this.#prix = prix,
@@ -37,28 +37,6 @@ export class Formation {
     get dateMiseEnLigne() {return this.#dateMiseEnLigne};
     get langue() {return this.#langue}
     get nbParticipants() {return this.#nbParticipants};
-
-
-    settitle(titre){
-        this.#titre = titre.trim();
-    }
-
-    setidCategorie(idCategorie){
-        this.#idCategorie = idCategorie;
-    }
-
-    setidContenu(idContent){
-        this.#idContent = idContent;
-    }
-
-
-
-    toJSON() {
-        return { idFormation: this.#idFormation, titre: this.#titre,  prix: this.#prix, description: this.#description, duration: this.#duration, dateMiseEnLigne: this.#dateMiseEnLigne, langue: this.#langue, nbParticipants: this.#nbParticipants, idCategorie: this.#idCategorie , idContent: this.#idContent};
-    }
-
-
-    
 
     static async findAll() {
         try {
@@ -116,27 +94,34 @@ export class Formation {
             const values = [];
             let paramIndex = 1;
 
-            if (dto.titre !== undefined) {
-                if (typeof dto.titre !== "string" || !dto.titre.trim()) {
-                    throw new Error("Invalid titre");
+            const validators = {
+                titre: v => typeof v === "string" && v.trim(),
+                description: v => typeof v === "string" && v.trim(),
+                prix: v => typeof v === "number" && v >= 0,
+                duration: v => typeof v === "number" && v > 0,
+                dateMiseEnLigne: v => !isNaN(new Date(v).getTime()),
+                langue: v => typeof v === "string" && v.trim(),
+                nbParticipants: v => typeof v === "number" && v >= 0,
+                nbVideos: v => typeof v === "number" && v >= 0,
+                idCategorie: v => typeof v === "number" && v > 0,
+                idContent: v => typeof v === "number" && v > 0,
+            };
+
+            for (const [key, validate] of Object.entries(validators)) {
+                if (dto[key] !== undefined) {
+                    if (!validate(dto[key])) {
+                        throw new Error(`Invalid ${key}`);
+                    }
+
+                    let value = dto[key];
+                    if (typeof value === "string") value = value.trim();
+                    if (key === "dateMiseEnLigne") value = new Date(value);
+
+                    updates.push(`${key} = $${paramIndex++}`);
+                    values.push(value);
                 }
-                updates.push(`titre = $${paramIndex++}`);
-                values.push(dto.titre.trim());
             }
-            if (dto.idCategorie !== undefined) {
-                if (typeof dto.idCategorie !== "number" || dto.idCategorie <= 0) {
-                    throw new Error("Invalid category ID");
-                }
-                updates.push(`idCategorie = $${paramIndex++}`);
-                values.push(dto.idCategorie);
-            }
-            if (dto.idContent !== undefined) {
-                if (typeof dto.idContent !== "number" || dto.idContent <= 0) {
-                    throw new Error("Invalid content ID");
-                }
-                updates.push(`idContent = $${paramIndex++}`);
-                values.push(dto.idContent);
-            }
+
 
             if (updates.length === 0) {
                 return existing; 
