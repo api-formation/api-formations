@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-//import { swaggerSpec } from "./swagger.js";
+import { swaggerSpec } from "./swagger.js";
+import swaggerUI from "swagger-ui-express";
 import formationsRoutes from "./routes/formation.route.js";
 import { connectMongoDB } from "./configs/db.mongo.js";
 import { connectPostgreSQL } from "./configs/db.postgres.js";
@@ -15,7 +16,7 @@ connectPostgreSQL();
 
 app.get("/", (req, res) => res.json({ message: "API OK" }));
 app.use("/api/formations", formationsRoutes);
-//app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
