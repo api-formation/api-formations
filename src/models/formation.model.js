@@ -40,7 +40,7 @@ export class Formation {
 
     static async findAll() {
         try {
-            const result = await getPool().query('SELECT * FROM formations ORDER BY idFormation ASC');
+            const result = await getPool().query('SELECT * FROM formations JOIN Categories ON formations.idCategorie = Categories.idCategorie ORDER BY idFormation ASC');
             return result.rows;
         } catch (error) {
             console.error('Erreur lors de la récupération des formations:', error);
@@ -55,7 +55,7 @@ export class Formation {
 
     static async findById(idFormation) {
         try {
-            const result = await getPool().query('SELECT * FROM formations WHERE idFormation = $1', [idFormation]);
+            const result = await getPool().query('SELECT * FROM formations JOIN Categories ON formations.idCategorie = Categories.idCategorie WHERE idFormation = $1', [idFormation]);
             return result.rows.length > 0 ? result.rows[0] : null;
         } catch (error) {
             console.error('Erreur lors de la récupération de la formation:', error);
