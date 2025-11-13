@@ -1,14 +1,15 @@
-// mongo.js
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-async function connectMongo() {
-  const uri = process.env.MONGO_URI 
+const connectMongo = async () => {
+  const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/logs_db";
 
-  await mongoose.connect(uri, {
-  
-  });
+  try {
+    await mongoose.connect(uri);
+    console.log("✅ Connecté à MongoDB :", uri);
+  } catch (err) {
+    console.error("❌ Erreur connexion MongoDB :", err);
+    throw err;
+  }
+};
 
-  console.log('Connecté à MongoDB pour les logs');
-}
-
-module.exports = connectMongo;
+export default connectMongo;
