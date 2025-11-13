@@ -32,6 +32,17 @@ MongoDB et les bonnes pratiques de sécurité.
 
 4. Création des tables PostgreSQL :
 ```
+
+CREATE TABLE roles (
+    idRole SERIAL PRIMARY KEY,
+    nom VARCHAR(255)
+);
+
+CREATE TABLE CATEGORIES (
+    idCategorie SERIAL,
+    nom VARCHAR(255)
+);
+
 CREATE TABLE formations (
     idFormation SERIAL,
     titre VARCHAR(255),
@@ -60,10 +71,20 @@ CREATE TABLE users (
     PRIMARY KEY (idUser)
 );
 
-CREATE TABLE roles (
-    idRole SERIAL,
-    nom VARCHAR(255),
-    PRIMARY KEY (idRole)
+CREATE TABLE formationsSuivies (
+    idFormationSuivies SERIAL PRIMARY KEY,
+    dateDebut DATE NOT NULL,
+    dateFin DATE,
+    idUser INT NOT NULL,
+    idFormation INT NOT NULL,
+    CONSTRAINT fk_user
+        FOREIGN KEY (idUser)
+        REFERENCES users(iduser)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_formation
+        FOREIGN KEY (idFormation)
+        REFERENCES formations(idformation)
+        ON DELETE CASCADE
 );
     
 ```
@@ -72,6 +93,15 @@ CREATE TABLE roles (
 npm run role
 ```
 
+6.Pour préremplir la table des catégories, exécutez la commande suivante :
+```bash
+npm run categories
+```
+### 🚀 **Démarrage du serveur**
+Pour démarrer le serveur, utilisez la commande suivante :
+```bash
+npm run dev
+```
 ---
 ##  **Les collaborateurs**
 
