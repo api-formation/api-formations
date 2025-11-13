@@ -26,5 +26,4 @@ for (const role of roles) {
   console.log("✅ Rôles par défaut insérés avec succès.");
   await pool.end();
 }
-
 seedRoles().catch(console.error);
