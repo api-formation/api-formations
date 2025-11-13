@@ -112,6 +112,66 @@ formationsSuiviesRoutes.get("/users/:idUser/formations", ctrl.findAllById);
 formationsSuiviesRoutes.get("/users/:idUser/formations/:idFormation", ctrl.findOneByUser);
 
 /**
+ * @openapi
+ * /api/formationssuivies/users/{idUser}/formations/{idFormation}:
+ *   post:
+ *     summary: Créer une formation suivie par un utilisateur
+ *     description: Lie un utilisateur existant à une formation. Cela crée une entrée dans la table `formationssuivies` avec la date de début automatique.
+ *     tags:
+ *       - FormationsSuivies
+ *     parameters:
+ *       - name: idUser
+ *         in: path
+ *         required: true
+ *         description: ID de l'utilisateur
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - name: idFormation
+ *         in: path
+ *         required: true
+ *         description: ID de la formation
+ *         schema:
+ *           type: integer
+ *           example: 3
+ *     responses:
+ *       201:
+ *         description: Formation suivie créée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 idformationsuivies:
+ *                   type: integer
+ *                   example: 12
+ *                 datedebut:
+ *                   type: string
+ *                   format: date
+ *                   example: 2025-11-13
+ *                 datefin:
+ *                   type: string
+ *                   format: date
+ *                   nullable: true
+ *                   example: null
+ *                 idformation:
+ *                   type: integer
+ *                   example: 3
+ *                 iduser:
+ *                   type: integer
+ *                   example: 1
+ *       400:
+ *         description: Requête invalide (ID manquant ou incorrect)
+ *       404:
+ *         description: Utilisateur ou formation non trouvé
+ *       500:
+ *         description: Erreur serveur interne
+ */
+
+formationsSuiviesRoutes.post("/users/:idUser/formations/:idFormation", ctrl.createFormationForUser);
+
+
+/**
  * @swagger
  * /api/formationssuivies/users/{idUser}/formations/{idFormation}:
  *   delete:

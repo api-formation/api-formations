@@ -22,14 +22,29 @@ export class Formation {
 
     static async findAllById(idUser) {
         const query = `
-            SELECT idformation
-            FROM formationssuivies
-            WHERE iduser = $1
-            ORDER BY datedebut DESC
+            SELECT fs.idformationsuivies,
+                   fs.datedebut,
+                   fs.datefin,
+                   f.idformation,
+                   f.titre,
+                   f.description,
+                   f.prix,
+                   f.duration,
+                   f.nbVideos,
+                   f.dateMiseEnLigne,
+                   f.langue,
+                   f.nbParticipants,
+                   f.idCategorie,
+                   f.idContent
+            FROM formationssuivies fs
+                     JOIN formations f ON fs.idformation = f.idformation
+            WHERE fs.iduser = $1
+            ORDER BY fs.datedebut DESC
         `;
         const result = await getPool().query(query, [idUser]);
-        return result.rows;
+        return result.rows; // renvoie un tableau complet avec toutes les colonnes
     }
+
 
 
     static async findOneByUser(idUser, idFormation) {
@@ -42,6 +57,26 @@ export class Formation {
         const result = await getPool().query(query, [idUser, idFormation]);
         return result.rows[0] || null;
     }
+    static async create(idUser, idFormation) {
+        // Vérifie si l'utilisateur suit déjà cette formation
+        const check = await getPool().query(
+            'SELECT * FROM formationssuivies WHERE iduser = $1 AND idformation = $2',
+            [idUser, idFormation]
+        );
+        if (check.rows.length > 0) {
+            throw new Error("L'utilisateur suit déjà cette formation");
+        }
+
+        // Sinon, on crée l'entrée
+        const query = `
+        INSERT INTO formationssuivies (datedebut, idformation, iduser)
+        VALUES (NOW(), $2, $1)
+        RETURNING *;
+    `;
+        const result = await getPool().query(query, [idUser, idFormation]);
+        return result.rows[0];
+    }
+
 
     static async deleteOneByUser(idUser, idFormation) {
         const result = await getPool().query(
