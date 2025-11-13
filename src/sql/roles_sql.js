@@ -18,7 +18,9 @@ async function seedRoles() {
 
 for (const role of roles) {
     await pool.query(
-      "INSERT INTO roles (idrole, nom) VALUES ($1, $2) ON CONFLICT (idrole) DO NOTHING",
+      `INSERT INTO roles (idrole, nom)
+       VALUES ($1, $2)
+       ON CONFLICT (idrole) DO NOTHING`,
       [role.idrole, role.nom]
     );
 }
@@ -26,5 +28,4 @@ for (const role of roles) {
   console.log("✅ Rôles par défaut insérés avec succès.");
   await pool.end();
 }
-
 seedRoles().catch(console.error);

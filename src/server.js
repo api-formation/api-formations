@@ -7,11 +7,20 @@ import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import { connectMongoDB } from "./configs/db.mongo.js";
 import { connectPostgreSQL } from "./configs/db.postgres.js";
+import session from "express-session";
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } 
+}));
 
 
 

@@ -30,10 +30,10 @@ export async function login(req, res, next) {
     if (!email || !mdp) return res.status(422).json({ message: "email and password required" });
 
      const user = await User.findByEmail(email);
-    if (!user) return res.status(401).json({ message: "Invaliddd credentials" });
+    if (!user) return res.status(401).json({ message: "Invalide credentials" });
 
     const ok = await bcrypt.compare(mdp, user.mdp);
-    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+    if (!ok) return res.status(401).json({ message: "Invalide credentials" });
 
 
     if (!JWT_SECRET) {
@@ -47,7 +47,11 @@ export async function login(req, res, next) {
       { expiresIn: JWT_EXPIRES }
     );
 
-    res.json({ accessToken: token, expiresIn: JWT_EXPIRES });
+    req.session.userId = user.idUser;
+    req.session.role = user.idRole === 1 ? "admin" : user.idRole === 2 ? "author" : "user";
+
+    
+    res.json({ accessToken: token, expiresIn: JWT_EXPIRES, user: { id: user.idUser, prenom: user.prenom, nom: user.nom, email: user.email, age: user.age, idrole: user.idrole } });
   } catch (err) {
     next(err);
   }
