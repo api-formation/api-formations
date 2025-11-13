@@ -7,6 +7,7 @@ import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import { connectMongoDB } from "./configs/db.mongo.js";
 import { connectPostgreSQL } from "./configs/db.postgres.js";
+import formationsSuiviesRoutes from "./routes/training-followed.route.js";
 const app = express();
 
 app.use(cors());
@@ -19,6 +20,7 @@ app.get("/", (req, res) => res.json({ message: "API OK" }));
 app.use("/api/formations", formationsRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/formationssuivies", formationsSuiviesRoutes);
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 
@@ -34,7 +36,5 @@ app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
     process.exit(1);
   }
 })()
-
-
 
 export default app;
