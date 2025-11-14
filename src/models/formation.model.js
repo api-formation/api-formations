@@ -107,6 +107,42 @@ export class Formation {
     } catch (err) {
       console.error("Erreur createOne (Postgres + log Mongo):", err);
       throw err;
+
+    get idFormation() {return this.#idFormation};
+    get titre() {return this.#titre};
+    get idCategorie() {return this.#idCategorie};
+    get idContent() {return this.#idContent};
+    get prix() {return this.#prix};
+    get description() {return this.#description}
+    get duration() {return this.#duration};
+    get nbVideos() {return this.#nbVideos}
+    get dateMiseEnLigne() {return this.#dateMiseEnLigne};
+    get langue() {return this.#langue}
+    get nbParticipants() {return this.#nbParticipants};
+
+    static async findAll() {
+        try {
+            const result = await getPool().query('SELECT * FROM formations JOIN Categories ON formations.idCategorie = Categories.idCategorie ORDER BY idFormation ASC');
+            return result.rows;
+        } catch (error) {
+            console.error('Erreur lors de la récupération des formations:', error);
+
+            if (error.code === '3D000' || error.message.includes('does not exist')) {
+                const dbName = process.env.DB_NAME || 'formations';
+                throw new Error(`La base de données "${dbName}" n'existe pas. Veuillez la créer dans pgAdmin.`);
+            }
+            throw error;
+        }
+    }
+
+    static async findById(idFormation) {
+        try {
+            const result = await getPool().query('SELECT * FROM formations JOIN Categories ON formations.idCategorie = Categories.idCategorie WHERE idFormation = $1', [idFormation]);
+            return result.rows.length > 0 ? result.rows[0] : null;
+        } catch (error) {
+            console.error('Erreur lors de la récupération de la formation:', error);
+            throw error;
+        }
     }
   }
 

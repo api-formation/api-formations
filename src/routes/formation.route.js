@@ -3,11 +3,20 @@ import * as ctrl from "../controllers/formation.controller.js";
 
 const formationsRoutes = Router();
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Formations
+ *   description: Gestion des formations
+ */
+
 /**
  * @openapi
  * /api/formations:
  *   get:
  *     summary: Get all formations
+ *     tags: [Formations]
  *     responses:
  *       200:
  *         description: A list of formations
@@ -19,6 +28,7 @@ formationsRoutes.get("/", ctrl.listFormations);
  * /api/formations/{id}:
  *   get:
  *     summary: Get a formation by ID
+ *     tags: [Formations]
  *     parameters:
  *       - in: path
  *         name: id
@@ -38,6 +48,7 @@ formationsRoutes.get("/:id", ctrl.getFormation);
  * /api/formations:
  *   post:
  *     summary: Create a new formation
+ *     tags: [Formations]
  *     requestBody:
  *       required: true
  *       content:
@@ -77,6 +88,7 @@ formationsRoutes.post("/", ctrl.createFormation);
  * /api/formations/{id}:
  *   put:
  *     summary: Update a formation
+ *     tags: [Formations]
  *     parameters:
  *       - in: path
  *         name: id
@@ -107,6 +119,7 @@ formationsRoutes.put("/:id", ctrl.updateFormation);
  * /api/formations/{id}:
  *   delete:
  *     summary: Delete a formation
+ *     tags: [Formations]
  *     parameters:
  *       - in: path
  *         name: id
