@@ -6,11 +6,9 @@ const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
     try {
-        // Connexion aux bases de données
         await connectMongo();
         await connectPostgreSQL();
 
-        // Démarrage du serveur
         app.listen(PORT, () => {
             console.log(`✅ Server running on http://localhost:${PORT}/`);
         });
