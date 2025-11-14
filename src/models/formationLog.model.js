@@ -1,4 +1,3 @@
-// src/models/formationLog.model.js
 import mongoose from "mongoose";
 
 const formationLogSchema = new mongoose.Schema(
