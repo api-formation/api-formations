@@ -1,14 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-export const connectMongoDB = async () => {
+const connectMongo = async () => {
+  const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/logs_db";
+
   try {
-    const conn = await mongoose.connect("mongodb://localhost:27017/api_formations", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`MongoDB connecté : ${conn.connection.name}`);
-  } catch (error) {
-    console.error("Erreur de connexion à MongoDB :", error.message);
-    process.exit(1); 
+    await mongoose.connect(uri);
+    console.log("✅ Connecté à MongoDB :", uri);
+  } catch (err) {
+    console.error("❌ Erreur connexion MongoDB :", err);
+    throw err;
   }
 };
+
+export default connectMongo;

@@ -95,7 +95,7 @@ npm run role
 
 6.Pour préremplir la table des catégories, exécutez la commande suivante :
 ```bash
-npm run categories
+npm run category
 ```
 ### 🚀 **Démarrage du serveur**
 Pour démarrer le serveur, utilisez la commande suivante :
