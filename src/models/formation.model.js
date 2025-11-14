@@ -1,30 +1,112 @@
-import { getPool } from '../configs/db.postgres.js';
-export class Formation {
-    #idFormation;
-    #titre;
-    #prix;
-    #description;
-    #duration;
-    #nbVideos;
-    #dateMiseEnLigne;
-    #langue;
-    #nbParticipants;
-    #idCategorie;
-    #idContent;
+// src/models/formation.model.js
+import { getPool } from "../configs/db.postgres.js";
+import FormationLog from "./formationLog.model.js";
 
-    constructor({ idFormation, titre, prix, description, duration, dateMiseEnLigne, langue, nbParticipants,idCategorie, idContent}) {
-        this.#idFormation = idFormation;
-        this.#titre = titre,
-        this.#prix = prix,
-        this.#description = description,
-        this.#duration = duration,
-        this.#nbVideos = nbVideos,
-        this.#dateMiseEnLigne = dateMiseEnLigne,
-        this.#langue = langue,
-        this.#nbParticipants = nbParticipants,
-        this.#idCategorie = idCategorie,
-        this.#idContent = idContent
+export class Formation {
+  // -----------------------------
+  //   MAPPING
+  // -----------------------------
+  static #fromRow(row) {
+    if (!row) return null;
+
+    return {
+      idFormation: row.idformation,
+      titre: row.titre,
+      prix: row.prix,
+      description: row.description,
+      duration: row.duration,
+      nbVideos: row.nbvideos,
+      dateMiseEnLigne: row.datemiseenligne,
+      langue: row.langue,
+      nbParticipants: row.nbparticipants,
+      idCategorie: row.idcategorie,
+      idContent: row.idcontent,
+    };
+  }
+
+ 
+  static async findAll() {
+    try {
+      const result = await getPool().query(
+        "SELECT * FROM formations ORDER BY idformation ASC;"
+      );
+      return result.rows.map((row) => Formation.#fromRow(row));
+    } catch (err) {
+      console.error("Erreur findAll:", err);
+      throw err;
     }
+  }
+
+  
+  static async findById(id) {
+    try {
+      const result = await getPool().query(
+        "SELECT * FROM formations WHERE idformation = $1",
+        [id]
+      );
+      return Formation.#fromRow(result.rows[0]);
+    } catch (err) {
+      console.error("Erreur findById:", err);
+      throw err;
+    }
+  }
+
+  
+  static async createOne(data, userId) {
+    try {
+      if (typeof data.titre !== "string" || !data.titre.trim()) {
+        throw new Error("Le titre doit être une chaîne non vide");
+      }
+
+      if (!userId) {
+        throw new Error("userId est obligatoire pour créer un log Mongo");
+      }
+
+      const pool = getPool();
+
+      // 1) Création dans PostgreSQL
+      const result = await pool.query(
+        `INSERT INTO formations
+        (titre, prix, description, duration, nbVideos, dateMiseEnLigne, langue, nbParticipants, idCategorie, idContent) 
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+        RETURNING *`,
+        [
+          data.titre.trim(),
+          data.prix,
+          data.description,
+          data.duration,
+          data.nbVideos,
+          data.dateMiseEnLigne,
+          data.langue,
+          data.nbParticipants,
+          data.idCategorie,
+          data.idContent,
+        ]
+      );
+
+      const row = result.rows[0];
+      console.log("🎓 Formation créée (Postgres):", row);
+
+      const formationId = row.idformation; // <-- IMPORTANT : minuscule
+
+      if (!formationId) {
+        throw new Error(
+          "Impossible de récupérer idformation pour le log Mongo"
+        );
+      }
+
+      // 2) LOG dans MongoDB
+      await FormationLog.create({
+        formationId,
+        userId: Number(userId),
+        action: "CREATE",
+      });
+
+      // 3) On renvoie la formation mappée
+      return Formation.#fromRow(row);
+    } catch (err) {
+      console.error("Erreur createOne (Postgres + log Mongo):", err);
+      throw err;
 
     get idFormation() {return this.#idFormation};
     get titre() {return this.#titre};
@@ -62,91 +144,61 @@ export class Formation {
             throw error;
         }
     }
+  }
 
+  
+  static async updateOne(idFormation, data) {
+    try {
+      const result = await getPool().query(
+        `UPDATE formations SET 
+          titre = $1,
+          prix = $2,
+          description = $3,
+          duration = $4,
+          nbVideos = $5,
+          dateMiseEnLigne = $6,
+          langue = $7,
+          nbParticipants = $8,
+          idCategorie = $9,
+          idContent = $10
+        WHERE idformation = $11
+        RETURNING *`,
+        [
+          data.titre,
+          data.prix,
+          data.description,
+          data.duration,
+          data.nbVideos,
+          data.dateMiseEnLigne,
+          data.langue,
+          data.nbParticipants,
+          data.idCategorie,
+          data.idContent,
+          idFormation,
+        ]
+      );
 
-    static async createOne({titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent}) {
-        try {
-
-            if (typeof titre !== "string" || !titre.trim()) {
-                throw new Error("Title must be a non-empty string");
-            }
-
-            const result = await getPool().query(
-                'INSERT INTO formations (titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
-                [titre.trim(), prix, description, duration, nbVideos, dateMiseEnLigne, langue, nbParticipants, idCategorie, idContent]
-            );
-            return result.rows[0];
-        } catch (error) {
-            console.error('Erreur lors de la création de la formation:', error);
-            throw error;
-        }
+      return Formation.#fromRow(result.rows[0]);
+    } catch (err) {
+      console.error("Erreur updateOne:", err);
+      throw err;
     }
+  }
 
+ 
+  static async deleteOne(idFormation) {
+    try {
+      const result = await getPool().query(
+        "DELETE FROM formations WHERE idformation = $1 RETURNING idformation",
+        [idFormation]
+      );
 
-    static async updateOne(idFormation, dto) {
-        try {
-      
-            const existing = await this.findById(idFormation);
-            if (!existing) return null;
-
-
-            const updates = [];
-            const values = [];
-            let paramIndex = 1;
-
-            const validators = {
-                titre: v => typeof v === "string" && v.trim(),
-                description: v => typeof v === "string" && v.trim(),
-                prix: v => typeof v === "number" && v >= 0,
-                duration: v => typeof v === "number" && v > 0,
-                dateMiseEnLigne: v => !isNaN(new Date(v).getTime()),
-                langue: v => typeof v === "string" && v.trim(),
-                nbParticipants: v => typeof v === "number" && v >= 0,
-                nbVideos: v => typeof v === "number" && v >= 0,
-                idCategorie: v => typeof v === "number" && v > 0,
-                idContent: v => typeof v === "number" && v > 0,
-            };
-
-            for (const [key, validate] of Object.entries(validators)) {
-                if (dto[key] !== undefined) {
-                    if (!validate(dto[key])) {
-                        throw new Error(`Invalid ${key}`);
-                    }
-
-                    let value = dto[key];
-                    if (typeof value === "string") value = value.trim();
-                    if (key === "dateMiseEnLigne") value = new Date(value);
-
-                    updates.push(`${key} = $${paramIndex++}`);
-                    values.push(value);
-                }
-            }
-
-
-            if (updates.length === 0) {
-                return existing; 
-            }
-
-            values.push(idFormation);
-
-            const query = `UPDATE formations SET ${updates.join(', ')} WHERE idFormation = $${paramIndex} RETURNING *`;
-            const result = await getPool().query(query, values);
-
-            return result.rows[0];
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour de la formation:', error);
-            throw error;
-        }
+      return result.rowCount > 0;
+    } catch (err) {
+      console.error("Erreur deleteOne:", err);
+      throw err;
     }
-
-
-    static async deleteOne(idFormation) {
-        try {
-            const result = await getPool().query('DELETE FROM formations WHERE idFormation = $1 RETURNING idFormation', [idFormation]);
-            return result.rowCount > 0; 
-        } catch (error) {
-            console.error('Erreur lors de la suppression de la formation', error);
-            throw error;
-        }
-    }
+  }
 }
+
+export default Formation;

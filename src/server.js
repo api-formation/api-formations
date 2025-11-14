@@ -3,6 +3,9 @@ import cors from "cors";
 import { swaggerSpec } from "./swagger.js";
 import swaggerUI from "swagger-ui-express";
 import formationsRoutes from "./routes/formation.route.js";
+import connectMongo from "./configs/db.mongo.js"; 
+import { connectPostgreSQL } from "./configs/db.postgres.js";
+
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 import { connectMongoDB } from "./configs/db.mongo.js";
@@ -36,5 +39,23 @@ app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
     process.exit(1);
   }
 })()
+
+// 🚀 Bootstrapping de l'appli
+const startServer = async () => {
+  try {
+    // Connexion aux BDD
+    await connectPostgreSQL();
+    await connectMongo();
+
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on http://localhost:${PORT}/`);
+    });
+  } catch (err) {
+    console.error("❌ Erreur au démarrage du serveur :", err);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app;
