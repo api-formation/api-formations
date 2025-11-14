@@ -1,3 +1,6 @@
+import { connectMongoDB } from "./configs/db.mongo.js";
+import { connectPostgreSQL } from "./configs/db.postgres.js";
+import app from "./app.js";
 import express from "express";
 import cors from "cors";
 import { swaggerSpec } from "./swagger.js";
