@@ -9,9 +9,8 @@
     "role": "node src/sql/roles_sql.js",
     "start": "cross-env NODE_ENV=production node src/server.js",
     "dev": "cross-env NODE_ENV=development nodemon src/server.js"
-  
   },
-  "jest":{
+  "jest": {
     "testEnvironment": "node",
     "transform": {}
   },
@@ -20,6 +19,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@jest/globals": "^30.2.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
