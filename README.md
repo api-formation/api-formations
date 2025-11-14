@@ -54,7 +54,10 @@ CREATE TABLE formations (
     nbParticipants int,
     nbVideos int,
     idContent int,
-    idCategorie int,
+    CONSTRAINT fk_categotie
+        FOREIGN KEY (idCategorie)
+        REFERENCES categotie(idCategorie)
+        ON DELETE CASCADE,
     PRIMARY KEY (idFormation)
 
 );
@@ -66,8 +69,14 @@ CREATE TABLE users (
     email VARCHAR,
     mdp VARCHAR,
     age int,
-    idFormationSuivies int,
-    idRole int,
+    CONSTRAINT fk_formationssuivies
+        FOREIGN KEY (idFormationsuivies)
+        REFERENCES formationssuivies(idformationsuivies)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_roles
+        FOREIGN KEY (idRole)
+        REFERENCES users(idRole)
+        ON DELETE CASCADE,
     PRIMARY KEY (idUser)
 );
 
