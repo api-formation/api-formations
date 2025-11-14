@@ -38,10 +38,11 @@ export const getFormation = async (req, res, next) => {
 
 export const createFormation = async (req, res, next) => {
   try {
-      if (!req.session?.role || (req.session.role !== "admin" && req.session.role !== "author")) {
+    if (!req.session?.role || (req.session.role !== "admin" && req.session.role !== "author")) {
       return res.status(403).json({ error: "Accès refusé : rôle insuffisant" });
     }
-    const { titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent } = req.body;
+    const body = req.body || {};
+    const { titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent } = body;
     if ( titre  === undefined) {
       return res
         .status(400)
@@ -59,9 +60,10 @@ export const updateFormation = async (req, res, next) => {
     if (!req.session?.role || (req.session.role !== "admin" && req.session.role !== "author")) {
       return res.status(403).json({ error: "Accès refusé : rôle insuffisant" });
     }
-    const updated = await Formation.updateOne(Number(req.params.id), req.body);
+    const id = parseInt(req.params.id, 10);
+    const updated = await Formation.updateOne(id, req.body);
     if (!updated)
-      return res.status(404).json({ error: "Livre non trouvé" });
+      return res.status(404).json({ error: "Formation non trouvé" });
     return res.status(200).json(updated);
   } catch (e) {
     next(e);
@@ -74,7 +76,7 @@ export const deleteFormation = async (req, res, next) => {
       return res.status(403).json({ error: "Accès refusé : rôle insuffisant" });
     }
     const ok = await Formation.deleteOne(Number(req.params.id));
-    if (!ok) return res.status(404).json({ error: "Livre non trouvé" });
+    if (!ok) return res.status(404).json({ error: "Formation non trouvé" });
     return res.status(204).send();
   } catch (e) {
     next(e);

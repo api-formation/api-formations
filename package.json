@@ -4,11 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --runInBand --detectOpenHandles --testTimeout=30000",
     "category": "node src/sql/categories_sql.js",
     "role": "node src/sql/roles_sql.js",
     "start": "cross-env NODE_ENV=production node src/server.js",
     "dev": "cross-env NODE_ENV=development nodemon src/server.js"
+  
+  },
+  "jest":{
+    "testEnvironment": "node",
+    "transform": {}
   },
   "keywords": [],
   "author": "",
@@ -35,6 +40,7 @@
   "devDependencies": {
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "supertest-session": "^5.0.1"
   }
 }
