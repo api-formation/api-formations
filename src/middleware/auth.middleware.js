@@ -7,9 +7,19 @@ export function authMiddleware(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: payload.sub, email: payload.email };
+    req.user = payload;
     next();
   } catch (e) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
+
+  /*
+    function authorizeRole(...roles) {
+    return (req, res, next) => {
+    if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
+    if (!roles.includes(req.user.idrole)) return res.status(403).json({ message: 'Forbidden' });
+    next();
+  };
+}
+  */
 }

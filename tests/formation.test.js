@@ -39,7 +39,7 @@ beforeAll(async () => {
 describe("Formation API (mocked)", () => {
 
   test("POST /api/formations => 201", async () => {
-    const payload = { titre: "Test Post Formation", prix: 50 };
+    const payload = { titre: "Test Post Formation", description:"lala", prix: 50, idUser : 1 };
     const res = await request(app).post("/api/formations").send(payload);
     expect(res.status).toBe(201);
     expect(res.body.titre).toBe(payload.titre);

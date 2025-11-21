@@ -45,9 +45,15 @@ export const createFormation = async (req, res, next) => {
         .status(400)
         .json({ error: "Tous les champs sont requis" });
     }
-    const created = await Formation.createOne({ 
-      titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent
-    });
+    const userId = req.user?.idUser || req.user?.id || req.body.idUser;
+    if (!userId) {
+      return res.status(400).json({
+        error:
+          "userId est requis pour créer une formation (nécessaire pour le log Mongo).",
+      });
+    }
+    const created = await Formation.createOne(
+      { titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent }, Number(userId));
     return res.status(201).json(created);
   } catch (e) {
     next(e);
