@@ -48,7 +48,7 @@ export async function login(req, res, next) {
     );
 
     req.session.userId = user.idUser;
-    req.session.role = user.idRole === 1 ? "admin" : user.idRole === 2 ? "author" : "user";
+    req.session.role = user.idrole === 1 ? "admin" : user.idrole === 2 ? "author" : "user";
 
     
     res.json({ accessToken: token, expiresIn: JWT_EXPIRES, user: { id: user.idUser, prenom: user.prenom, nom: user.nom, email: user.email, age: user.age, idrole: user.idrole } });

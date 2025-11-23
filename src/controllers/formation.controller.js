@@ -1,4 +1,4 @@
-import { Formation } from "../models/formation.model.js";
+import {Formation} from "../models/formation.model.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -36,9 +36,9 @@ export const getFormation = async (req, res, next) => {
 export const createFormation = async (req, res, next) => {
   try {
 
-    if( !req.session || (req.session.role !== "admin" && req.session.role !== "author")) {
-      return  res.status(403).json({ error: "Forbidden" });
-    }
+      if (!req.session || (req.session.role !== "admin" && req.session.role !== "author")) {
+          return res.status(403).json({error: "Erreur de role"});
+      }
     const { titre,prix,description,duration,nbVideos,dateMiseEnLigne,langue,nbParticipants,idCategorie,idContent } = req.body;
     if ( titre  === undefined) {
       return res
@@ -62,12 +62,12 @@ export const createFormation = async (req, res, next) => {
 
 export const updateFormation = async (req, res, next) => {
   try {
-    if( !req.session || (req.session.role !== "admin" && req.session.role !== "author")) {
-        return  res.status(403).json({ error: "Forbidden" });
-    }
-    const updated = await Formation.updateOne(Number(req.params.id), req.body);
+      if (!req.session || (req.session.role !== "admin" && req.session.role !== "author")) {
+          return res.status(403).json({error: "Erreur de role"});
+      }
+      const updated = await Formation.updateOne(Number(req.params.id), req.body);
     if (!updated)
-      return res.status(404).json({ error: "Livre non trouvé" });
+        return res.status(404).json({error: "Formation non trouvé"});
     return res.status(200).json(updated);
   } catch (e) {
     next(e);
@@ -76,11 +76,11 @@ export const updateFormation = async (req, res, next) => {
 
 export const deleteFormation = async (req, res, next) => {
   try {
-    if( !req.session || (req.session.role !== "admin" && req.session.role !== "author")) {
-        return  res.status(403).json({ error: "Forbidden" });
-    }
+      if (!req.session || (req.session.role !== "admin" && req.session.role !== "author")) {
+          return res.status(403).json({error: "Erreur de role"});
+      }
     const ok = await Formation.deleteOne(Number(req.params.id));
-    if (!ok) return res.status(404).json({ error: "Livre non trouvé" });
+      if (!ok) return res.status(404).json({error: "Formation non trouvé"});
     return res.status(204).send();
   } catch (e) {
     next(e);

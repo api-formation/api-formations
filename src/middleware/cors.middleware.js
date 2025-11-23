@@ -1,5 +1,9 @@
 export const corsOptions = {
-  origin: process.env.FRONT_ORIGIN?.split(",") || ["http://localhost:5173"],
-  credentials: true,
-  optionsSuccessStatus: 200,
+    origin: (origin, callback) => {
+        // adapter selon votre front (ex: "http://localhost:3000")
+        callback(null, true);
+    },
+    credentials: true, // <--- important pour accepter les cookies
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 };

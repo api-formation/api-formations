@@ -77,6 +77,8 @@ formationsRoutes.get("/:id", ctrl.getFormation);
  *                 type: number
  *               idContent:
  *                 type: number
+ *               idUser:
+ *                 type: number
  *     responses:
  *       201:
  *         description: Formation created successfully
@@ -102,7 +104,7 @@ formationsRoutes.post("/", ctrl.createFormation);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               titre:
  *                 type: string
  *               description:
  *                 type: string
